@@ -1,0 +1,63 @@
+function cryptoGUI
+    % Create the main figure
+    fig = uifigure('Name', 'Caesar Cipher', 'Position', [500, 300, 400, 300]);
+
+    % Create components for plaintext input
+    lblPlaintext = uilabel(fig, 'Text', 'Plaintext:', 'Position', [20, 240, 100, 22]);
+    txtPlaintext = uieditfield(fig, 'text', 'Position', [120, 240, 250, 22]);
+
+    % Create components for key input
+    lblKey = uilabel(fig, 'Text', 'Shift Key:', 'Position', [20, 200, 100, 22]);
+    txtKey = uieditfield(fig, 'numeric', 'Position', [120, 200, 250, 22]);
+
+    % Create labels and text fields for encrypted and decrypted text
+    lblEncrypted = uilabel(fig, 'Text', 'Encrypted Text:', 'Position', [20, 160, 100, 22]);
+    txtEncrypted = uieditfield(fig, 'text', 'Editable', 'off', 'Position', [120, 160, 250, 22]);
+
+    lblDecrypted = uilabel(fig, 'Text', 'Decrypted Text:', 'Position', [20, 120, 100, 22]);
+    txtDecrypted = uieditfield(fig, 'text', 'Editable', 'off', 'Position', [120, 120, 250, 22]);
+
+    % Create the encrypt button
+    btnEncrypt = uibutton(fig, 'Text', 'Encrypt', 'Position', [50, 60, 100, 30], 'ButtonPushedFcn', @(~, ~)encryptCallback());
+
+    % Create the decrypt button
+    btnDecrypt = uibutton(fig, 'Text', 'Decrypt', 'Position', [200, 60, 100, 30], 'ButtonPushedFcn', @(~, ~)decryptCallback());
+
+    % Callback for encryption
+    function encryptCallback()
+        plaintext = txtPlaintext.Value;
+        key = txtKey.Value;
+        if isempty(plaintext) || isempty(key)
+            uialert(fig, 'Please enter both plaintext and key.', 'Input Error');
+            return;
+        end
+        encryptedText = encrypt_caesar(plaintext, key);
+        txtEncrypted.Value = encryptedText;
+        txtDecrypted.Value = '';
+    end
+
+    % Callback for decryption
+    function decryptCallback()
+        encryptedText = txtEncrypted.Value;
+        key = txtKey.Value;
+        if isempty(encryptedText) || isempty(key)
+            uialert(fig, 'Please encrypt text first or check the key.', 'Input Error');
+            return;
+        end
+        decryptedText = decrypt_caesar(encryptedText, key);
+        txtDecrypted.Value = decryptedText;
+    end
+
+    % Function to encrypt text using Caesar cipher
+    function encryptedText = encrypt_caesar(plaintext, key)
+        key = mod(key, 26); % Ensure key is within alphabet range
+        encryptedText = char(mod((double(plaintext) - double('A')) + key, 26) + double('A'));
+    end
+
+    % Function to decrypt text using Caesar cipher
+    function decryptedText = decrypt_caesar(encryptedText, key)
+        key = mod(key, 26); % Ensure key is within alphabet range
+        decryptedText = char(mod((double(encryptedText) - double('A')) - key + 26, 26) + double('A'));
+    end
+end
+
